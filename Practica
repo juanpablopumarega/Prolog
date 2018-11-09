@@ -1,0 +1,283 @@
+
+Las siguientes clausulas corresponden al programa “menú” de un restaurante. El
+restaurante ofrece menús completos compuestos por una entrada, un plato principal y un
+postre. El plato principal puede ser carne o pescado.
+
+Completar el programa “menú” de manera que una comida esté formada también por la elección de una bebida, a elegir entre vino, cerveza o  agua mineral.
+
+%clauses
+
+entrada(paella).
+entrada(gazpacho).
+entrada(consomé).
+
+carne(filete_de_cerdo).
+carne(pollo_asado).
+
+pescado(trucha).
+pescado(bacalao).
+
+postre(flan).
+postre(helado).
+postre(pastel).
+
+%fin clauses
+
+Implementar las reglas necesarias para formular las siguientes consultas en Prolog:
+a) Cuáles son los menús que ofrece el restaurante?
+b) Cuáles son los menús que tienen Consomé en las entradas?
+c) Cuáles son los menús que no contienen flan como postre?
+
+
+plato_principal(X):-carne(X);pescado(X).
+menu(E,PP,P):-entrada(E),plato_principal(PP),postre(P).
+menu_sin_flan(E,PP,P):-entrada(E),plato_principal(PP),postre(P),P\=flan.
+menu_con_bebida(E,PP,P,B):-entrada(E),plato_principal(PP),postre(P),bebida(B).
+
+a():-menu(E,PP,P),write(E+PP+P),nl,fail.
+b():-menu(consomé,PP,P),write(consomé+PP+P),nl,fail.
+c():-menu_sin_flan(E,PP,P),write(E+PP+P),nl,fail.
+d():-menu_con_bebida(E,PP,P,B),write(E+PP+P+B),nl,fail.
+
+--------------------------------------------------------------------------------
+
+niño(X,Y)//expresa que X es hijo o hija de Y.
+hijo(X,Y)//expresa que X es un hijo varón de Y.
+hija(x,y)//expresa que X es una hija de Y.
+hermano-o-hermana(X,Y)//expresa que X es hermano o hermana de Y.
+hermano(X,Y)//expresa que X es un hermano de Y.
+hermana(X,Y)//expresa que X es una hermana de Y.
+
+Nota:  Un individuo no puede ser hermano ni  hermana de sí mismo.
+
+
+hombre(pedro).
+hombre(manuel).
+hombre(arturo).
+mujer(maría).
+padre(pedro,manuel).
+padre(pedro,arturo).
+padre(pedro,maría).
+
+niño(X,Y):-padre(Y,X).
+hijo_varon(X,Y):-padre(Y,X),hombre(X).
+hija(X,Y):-padre(Y,X),mujer(X).
+hermanos(X,Y):-niño(X,P),niño(Y,P),not(X==Y).
+hermano(X,Y):-hombre(X),niño(X,P),niño(Y,P),not(X==Y).
+hermana(X,Y):-mujer(X),niño(X,P),niño(Y,P),not(X==Y).
+
+a():-niño(X,Y),write(X),write(" es hijo de: "),write(Y),nl,fail.
+b():-hijo_varon(X,Y),write(X),write(" es hijo varon de: "),write(Y),nl,fail.
+c():-hija(X,Y),write(X),write(" es hija mujer de: "),write(Y),nl,fail.
+d():-hermanos(X,Y),write(X),write(" es hermano de: "),write(Y),nl,fail.
+e():-hermano(X,Y),write(X),write(" es hermano de: "),write(Y),nl,fail.
+f():-hermana(X,Y),write(X),write(" es hermana de: "),write(Y),nl,fail.
+
+-------------------------------------------------------------------------------
+
+Una agencia de viajes propone a sus clientes viajes de una o dos semanas a Roma, Londres o Túnez.
+El catálogo de la agencia contiene, para cada destino, el precio del transporte (con     independencia de la duración) y el precio de una semana de estancia que varía según el destino y el nivel de comodidad elegidos: hotel, hostal o camping.
+Escribir el conjunto de declaraciones que describen este catálogo (se muestra a continuación).
+
+%clauses
+transporte(roma,20).
+transporte(londres,30).
+transporte(tunez,10).
+
+alojamiento(roma,hotel,50).
+alojamiento(roma,hostal,30).
+alojamiento(roma,camping,10).
+alojamiento(londres,hotel,60).
+alojamiento(londres,hostal,40).
+alojamiento(londres,camping,20).
+alojamiento(tunez,hotel,40).
+alojamiento(tunez,hostal,20).
+alojamiento(tunez,camping,5).
+%finclauses
+
+Expresar la relación viaje(C,S,H,P) que se interpreta por: el viaje a la ciudad C durante S semanas con estancia en H cuesta P pesos.
+Completar con viajeeconomico(C,S,H,P,Pmax) que expresa que el costo P es menor quePmax pesos.
+
+Se utilizarán las reglas secundarias:
+multiplicar (P,X,Y):- P is X*Y.
+sumar (S,X,Y):- S is X+Y.
+menor (X,Y):-  X<Y
+
+interpretables respectivamente por:  P= X*Y;  S= X+Y ;  X<Y.
+
+
+
+%clauses
+transporte(roma,20).
+transporte(londres,30).
+transporte(tunez,10).
+alojamiento(roma,hotel,50).
+alojamiento(roma,hostal,30).
+alojamiento(roma,camping,10).
+alojamiento(londres,hotel,60).
+alojamiento(londres,hostal,40).
+alojamiento(londres,camping,20).
+alojamiento(tunez,hotel,40).
+alojamiento(tunez,hostal,20).
+alojamiento(tunez,camping,5).
+%finclauses
+
+multiplicar(P,X,Y):- P is X*Y.
+sumar(S,X,Y):- S is X+Y.
+
+viaje(C,S,H,P):-transporte(C,PrecioT),alojamiento(C,H,PrecioA),multiplicar(PporSemana,PrecioA,S),P is PporSemana+PrecioT.
+viajeeconomico(C,S,H,P,Pmax):-transporte(C,PrecioT),alojamiento(C,H,PrecioA),multiplicar(PporSemana,PrecioA,S), sumar(P,PporSemana,PrecioT),P<Pmax.
+
+a():-viaje(C,2,H,P),write(C+2+H+P),nl,fail.
+b():-viajeeconomico(C,2,H,P,100),write(C+2+H+P+100),nl,fail.
+
+---------------------------------------------------------------------------------
+
+%clauses
+parcial1(ana,7).
+parcial1(juan,9).
+parcial1(pepe,2).
+parcial2(ana,8).
+parcial2(juan,8).
+parcial2(pepe,2).
+parcial2(pepino,10).
+%finclauses
+
+sumar(X,Y,R):-R is X+Y.
+dividir(X,Y,R):-R is X/Y.
+
+promocion(X,Y):-parcial1(X,P1),parcial2(X,P2),sumar(P1,P2,S),dividir(S,2,Promedio),Promedio>7,Y is Promedio.
+cursada(X,Y):-parcial1(X,P1),parcial2(X,P2),sumar(P1,P2,S),dividir(S,2,Promedio),Promedio>=4,Promedio=<7,Y is Promedio.
+recursa(X,Y):-parcial1(X,P1),parcial2(X,P2),sumar(P1,P2,S),dividir(S,2,Promedio),Promedio<4,Y is Promedio.
+ausente(X):-parcial1(X,_),not(parcial2(X,_));parcial2(X,_),not(parcial1(X,_)).
+
+prod_cart(X,X1,Y,Y1):-promocion(X,X1),promocion(Y,Y1).
+seleccion(X,X1,Y,Y1):-prod_cart(X,X1,Y,Y1),X1<Y1.
+proyeccion(X,X1):-seleccion(X,X1,_,_).
+maximo(X,Y):-promocion(X,Y), not(proyeccion(X,Y)).
+
+a():-promocion(X,Y),write(X+Y),nl,fail.
+b():-cursada(X,Y),write(X+Y),nl,fail.
+c():-recursa(X,Y),write(X+Y),nl,fail.
+d():-maximo(X,Y),write(X+Y),nl,fail.
+e():-ausente(X),write(X),nl,fail.
+
+---------------------------------------------------------------------------
+
+Una agencia matrimonial tiene un fichero de candidatos al matrimonio organizado según las declaraciones siguientes:
+
+hombre(N,A,C,E).
+mujer(N,A,C,E).
+ 
+donde n  es el nombre de un hombre o una mujer, a  su altura (alta, media, baja), c  el color de su cabello (rubio, castaño, pelirrojo, negro) y e  su edad (joven,adulta,vieja).
+
+gusta(N,M,L,S).
+
+que indica que a la persona n  le gusta el género de música m  (clásica, pop, jazz), el género de literatura L   (aventura, ciencia-ficción, policíaca), y practica el deporte  s   (tenis, natación, jogging).
+
+ busca(N,A,C,E).
+
+que expresa que la persona n  busca una pareja de altura a,  con cabello color c  y edad e.   Se considera que dos personas  x  e  y  de sexos diferentes son adecuadas si x  conviene a y  e y conviene a x.  Se dice que x  conviene a y  si x  conviene físicamente a y (la altura, edad y color de cabello de y  son los que busca x) y si, además, los gustos de x  e y  en música, literatura y deporte coinciden.
+
+
+hombre(juan,50,gris,40).
+mujer(mercedes,20,negro,35).
+gusta(juan,clasica,aventura,padel).
+gusta(mercedes,clasica,aventura,padel).
+busca(juan,20,negro,35).
+busca(mercedes,50,gris,40).
+
+adecuadas(X,Y):-hombre(X,A,C,E),mujer(Y,A1,C1,E1),gusta(X,A0,A1,A2),gusta(Y,A0,A1,A2),busca(X,A1,C1,E1),busca(Y,A,C,E).
+
+a():-adecuadas(X,Y),write(X+Y),nl,fail.
+
+---------------------------------------------------------------------------
+
+8.	Definir la relación mcd (X,Y,Z) que se verifique si Z es el máximo común divisor entre X e Y.  
+Por ejemplo:
+
+mcd(10,15,X).
+		X = 5
+
+9.	Define un predicado  mcm(X,Y,M)  que signifique "M es el mínimo común múltiplo de X e Y"
+
+mcd(X,X,X).
+mcd(X,Y,N):-Y>X, R1 is Y-X,mcd(X,R1,N).
+mcd(X,Y,N):-X>Y,mcd(Y,X,N).
+b():-mcd(100,80,N),write(N),nl,fail.
+
+mcm(X,Y,N):-mcd(X,Y,R1), N is (X*Y)/R1.
+c():-mcm(200,55,N),write(N),nl,fail.
+
+
+---------------------------------------------------------------------------
+
+2.	Codifique en prolog las reglas necesarias para obtener el término N en la serie de Fibonacci
+
+fibonacci(0,0):-!.
+fibonacci(1,1):-!.
+fibonacci(X,N):- R1 is X-1, R2 is X-2, fibonacci(R1,Res1), fibonacci(R2,Res2), N is Res1 + Res2.
+a():-fibonacci(7,R),write(R),nl,fail.
+
+---------------------------------------------------------------------------
+
+3.	Codifique en prolog las reglas necesarias para obtener el factorial de un número natural N. 
+
+factorial(0,0):-!.
+factorial(1,1):-!.
+factorial(X,N):- R1 is X-1, factorial(R1,Res1), N is X*Res1.
+f():-factorial(5,N),write(N),nl,fail.
+
+
+---------------------------------------------------------------------------
+
+1.	Codifique en prolog las reglas necesarias para obtener el término N en la serie de Gauss
+
+gauss(0,0):-!.
+gauss(1,1):-!.
+gauss(X,N):- R1 is X-1, gauss(R1,Res1), N is X+Res1.
+g():-gauss(3,N),write(N),nl,fail.
+
+
+---------------------------------------------------------------------------
+
+4.	Codifique en prolog las reglas necesarias para obtener el producto de dos numeros  X e Y,  aplicando sumas sucesivas. 
+
+producto(_,0,0):-!.
+producto(X,1,X):-!.
+producto(X,Y,R):- Y>1, R1 is Y-1, producto(X,R1,Res1), R is X+Res1.
+p():-producto(5,1,R),write(R),nl,fail.
+
+
+---------------------------------------------------------------------------
+
+5.	Codifique en prolog las reglas necesarias para obtener la potencia N de un numero X aplicando multiplicaciones sucesivas. 
+
+potencia(_,0,1):-!.
+potencia(X,Y,R):- R1 is Y-1, potencia(X,R1,Res1), R is X*Res1.
+po():-potencia(0,2,R),write(R),nl,fail.
+
+
+---------------------------------------------------------------------------
+
+6.	Codifique en prolog las reglas necesarias para obtener la el cociente entre dos números a partir de restas sucesivas.  
+
+cociente(_,0,indeterminado):-!.
+cociente(X,Y,0):-Y>X,!.
+cociente(X,Y,R):- R1 is X-Y, cociente(R1,Y,Res1), R is Res1+1.
+co():-cociente(10,4,R),write(R),nl,fail.
+
+
+---------------------------------------------------------------------------
+
+7.	Idem 6, pero que permita obtener el cociente y el resto.
+
+cociente_resto(_,0,indeterminado,indeterminado):-!.
+cociente_resto(X,Y,0,X):-Y>X,!.
+cociente_resto(X,Y,R,Resto):- R1 is X-Y, cociente_resto(R1,Y,Res1,Resto), R is Res1+1.
+co_resto():-cociente_resto(10,6,R,RESTO),write(R+RESTO),nl,fail.
+
+---------------------------------------------------------------------------
+
+
+
